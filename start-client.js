@@ -36,7 +36,7 @@ function createRequire(moduleFilePath) {
     if (typeof mockDependencies === 'object') {
       Object.keys(mockDependencies).forEach(function (name) {
         var realPath;
-        if (name in window.__cjsModuleAliases) {
+        if (window.__cjsModuleAliases && name in window.__cjsModuleAliases) {
           realPath = window.__cjsModuleAliases[name];
         } else {
           realPath = normalizePath(moduleFilePath, name);
