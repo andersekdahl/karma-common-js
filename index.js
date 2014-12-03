@@ -26,9 +26,9 @@ function createPreprocessor(config, basePath, logger) {
 
   function shouldAutoStart(filepath) {
     for (var i = 0; i < autostartPatterns.length; i++) {
-        if (minimatch(filepath, autostartPatterns[i])) {
-            return true;
-        }
+      if (minimatch(filepath, autostartPatterns[i])) {
+        return true;
+      }
     }
     return false;
   }
