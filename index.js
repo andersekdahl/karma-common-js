@@ -50,7 +50,7 @@ function createPreprocessor(config, basePath, logger) {
       'window.__cjsModules = window.__cjsModules || {};' +
       'window.__cjsModules["' + file.originalPath + '"] = ' +
         'function (require, module, exports, global, __filename, __dirname, process) {';
-    var wrapperFoot = '};window.__cjsModules["' + file.originalPath + '"].autostart = ' + shouldAutoStart(file.originalPath);
+    var wrapperFoot = '\n};window.__cjsModules["' + file.originalPath + '"].autostart = ' + shouldAutoStart(file.originalPath);
 
     // If the file is something other than a .js file, we have
     // to add .js to make Karma serve it as a js file.
