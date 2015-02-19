@@ -101,6 +101,9 @@ function startModule(moduleFilePath) {
   var process = {
     nextTick: function (fn) {
       setTimeout(fn, 0);
+    },
+    env: {
+
     }
   };
 
