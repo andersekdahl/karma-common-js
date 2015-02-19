@@ -167,7 +167,7 @@ function createPreprocessor(config, basePath, logger) {
       stream.end();
     });
 
-    processedContent = processedContent.replace(/require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
+    processedContent = processedContent.replace(/^(?!\s*[\/\/|\*]).*require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
 
     wrappedContent = aliases + wrapperHead + processedContent + wrapperFoot;
 
