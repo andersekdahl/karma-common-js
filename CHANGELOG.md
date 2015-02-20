@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.3
+
+### Fixes
+* Do not replace the variable name in a require statement. With `var module = require('module');` the variable name `module` was replaced since it had the same name as the required module.
+
 ## v0.1.2
 
 ### Fixes
