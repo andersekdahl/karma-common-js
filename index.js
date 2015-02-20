@@ -150,7 +150,7 @@ function createPreprocessor(config, basePath, logger) {
           });
         });
       }
-      return match.replace(moduleName, modulePath);
+      return match.replace(/require\(.*?\)/, 'require("' + modulePath + '")');
     }
 
     var processedContent = content;
