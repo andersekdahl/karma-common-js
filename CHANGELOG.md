@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.0
+
+### Features
+* Make it possible to specify patterns to exclude transforms for different files. Useful if you only want to apply transforms on your files and not files in `node_modules`.
+
 ## v0.1.3
 
 ### Fixes
