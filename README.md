@@ -6,7 +6,7 @@ Test CommonJS modules without using Browserify
 What's the point of creating yet another karma preprocessor for CommonJS modules? Because it scratched an itch, and because I think there's a need for a preprocessor which doesn't use Browserify, but exposes the feature set of Browserify like requiring Node built-in modules and respecting the `browser` field of `package.json` in modules.
 
 # How does it work?
-Instead of using Browserify to build a bundle (which takes way too long) this preprocessor finds all require statements in your code and rewrites them to absolute paths. If you require something from `node_modules`, that path gets rewritten to the correct path as well (and it respects the `browser` field in that packages `package.json`). 
+Instead of using Browserify to build a bundle (which takes way too long) this preprocessor finds all require statements in your code and rewrites them to absolute paths. If you require something from `node_modules`, that path gets rewritten to the correct path as well (and it respects the `browser` field in that packages `package.json`).
 
 It takes all code inside your js files and wrap it in functions which gets the Common JS variables passed in like `module`, `global`, etc. So when the code runs, the require function looks up that created function for the correct path, and invokes it if it hasn't been invoked before.
 
@@ -72,8 +72,11 @@ This section is for configuring the preprocessor:
 common_js: {
   transforms: {
     'html-browserify': true // If you want it
+    'babelify': {
+      exclude: '**/node_modules/**' // Don't apply the babelify transform for files in node_modules
+    }
   },
-  // Array of globs to auto require when the tests run. You can use 
+  // Array of globs to auto require when the tests run. You can use
   // this to control the entry point for your tests.
   autoRequire: [
     '**/*-test.js'
