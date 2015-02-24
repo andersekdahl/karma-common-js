@@ -157,6 +157,23 @@ function createPreprocessor(config, basePath, logger) {
 
     // Allow Browserify streams to process the file first
     Object.keys(transforms).forEach(function (transformName) {
+      if (transforms[transformName].exclude) {
+        var excludePatterns = [];
+        if (!Array.isArray(transforms[transformName].exclude)) {
+          excludePatterns.push(transforms[transformName].exclude);
+        } else {
+          excludePatterns = transforms[transformName].exclude;
+        }
+
+        for (var i = 0; i < excludePatterns.length; i++) {
+          var pattern = excludePatterns[i];
+          if (minimatch(file.originalPath, pattern)) {
+            log.debug('Excluding "' + file.originalPath + '" for the "' + transformName + '" transform');
+            return;
+          }
+        }
+      }
+      log.debug('Running transform "' + transformName + '" on "' + file.originalPath + '"');
       var transformer = require(transformName);
       var stream = transformer(file.originalPath);
 
