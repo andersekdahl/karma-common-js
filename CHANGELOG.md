@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.1
+
+### Fixes
+* Replace all instances of `new Buffer()` with `new require('buffer').Buffer()` to make up for not having a global `Buffer` constructor.
+
 ## v0.2.0
 
 ### Features
