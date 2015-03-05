@@ -184,6 +184,14 @@ function createPreprocessor(config, basePath, logger) {
       stream.end();
     });
 
+    var usesGlobalBuffer = (processedContent.indexOf('new Buffer') !== -1);
+    var isBufferModule = (file.originalPath.indexOf('browser-builtins/node_modules/buffer/index.js') !== -1);
+
+    // If any module uses the global Buffer constructor, we want to replace that with a call to require it first
+    if (usesGlobalBuffer && !isBufferModule) {
+      processedContent = processedContent.replace(/new Buffer/g, "new require('buffer').Buffer");
+    }
+
     processedContent = processedContent.replace(/^(?!\s*[\/\/|\*]).*require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
 
     wrappedContent = aliases + wrapperHead + processedContent + wrapperFoot;
