@@ -98,25 +98,21 @@ function startModule(moduleFilePath) {
   dirname.pop();
   dirname = dirname.join('/');
 
-  var process = {
-    nextTick: function (fn) {
-      setTimeout(fn, 0);
-    },
-    env: {
-
-    }
-  };
-
   window.__cjsModules[moduleFilePath].call({},
     createRequire(moduleFilePath),
     module,
     module.exports,
     window,
     filename,
-    dirname,
-    process
+    dirname
   );
 }
+
+Object.keys(window.__cjsModules).forEach(function (filepath) {
+  if (window.__cjsModules[filepath].startFirst) {
+    startModuleIfNeeded(filepath);
+  }
+});
 
 Object.keys(window.__cjsModules).forEach(function (filepath) {
   if (window.__cjsModules[filepath].autostart) {

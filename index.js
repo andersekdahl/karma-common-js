@@ -7,8 +7,17 @@ var minimatch = require('minimatch');
 var browserBuiltins = require('browser-builtins');
 
 var startClientFile = path.normalize(__dirname + '/start-client.js');
+var globalsFile = path.normalize(__dirname + '/globals.js');
 
-function framework(files) {
+function framework(files, preprocessors) {
+  preprocessors[globalsFile] = ['common_js'];
+
+  files.unshift({
+    pattern: globalsFile,
+    included: true,
+    served: true,
+    watched: false
+  });
   files.push({
     pattern: startClientFile,
     included: true,
@@ -17,7 +26,7 @@ function framework(files) {
   });
 }
 
-function createPreprocessor(config, basePath, logger) {
+function createPreprocessor(config, logger) {
   var log = logger.create('preprocessor.common_js');
   var seenNpmFiles = [];
   var npmFilesPerModule = {};
@@ -25,6 +34,10 @@ function createPreprocessor(config, basePath, logger) {
   var autostartPatterns = config.autoRequire || ['**/*.js'];
 
   function shouldAutoStart(filepath) {
+    if (globalsFile === filepath) {
+      return true;
+    }
+
     for (var i = 0; i < autostartPatterns.length; i++) {
       if (minimatch(filepath, autostartPatterns[i])) {
         return true;
@@ -49,9 +62,10 @@ function createPreprocessor(config, basePath, logger) {
     var wrapperHead =
       'window.__cjsModules = window.__cjsModules || {};' +
       'window.__cjsModules["' + file.originalPath + '"] = ' +
-        'function (require, module, exports, global, __filename, __dirname, process) {';
-    var wrapperFoot = '\n};window.__cjsModules["' + file.originalPath + '"].autostart = ' + shouldAutoStart(file.originalPath);
-
+        'function (require, module, exports, global, __filename, __dirname) {';
+    var wrapperFoot = '\n};window.__cjsModules["' + file.originalPath + '"].autostart = ' + shouldAutoStart(file.originalPath) + ';' +
+                      'window.__cjsModules["' + file.originalPath + '"].startFirst = ' + (file.originalPath === globalsFile) + ';';
+    
     // If the file is something other than a .js file, we have
     // to add .js to make Karma serve it as a js file.
     // This is for things like transforming an .html file
@@ -184,14 +198,6 @@ function createPreprocessor(config, basePath, logger) {
       stream.end();
     });
 
-    var usesGlobalBuffer = (processedContent.indexOf('new Buffer') !== -1);
-    var isBufferModule = (file.originalPath.indexOf('browser-builtins/node_modules/buffer/index.js') !== -1);
-
-    // If any module uses the global Buffer constructor, we want to replace that with a call to require it first
-    if (usesGlobalBuffer && !isBufferModule) {
-      processedContent = processedContent.replace(/new Buffer/g, "new require('buffer').Buffer");
-    }
-
     processedContent = processedContent.replace(/^(?!\s*[\/\/|\*]).*require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
 
     wrappedContent = aliases + wrapperHead + processedContent + wrapperFoot;
@@ -205,8 +211,8 @@ function createPreprocessor(config, basePath, logger) {
   return process;
 }
 
-framework.$inject = ['config.files'];
-createPreprocessor.$inject = ['config.common_js', 'config.basePath', 'logger'];
+framework.$inject = ['config.files', 'config.preprocessors'];
+createPreprocessor.$inject = ['config.common_js', 'logger'];
 
 module.exports = {
   'framework:common_js': ['factory', framework],
