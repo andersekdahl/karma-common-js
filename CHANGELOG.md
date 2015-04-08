@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.2.2
+
+### Fixes
+* Don't throw a preprocess error for things like `require('cry' + 'pto')`. Instead, throw a runtime error which can be caught to detect if the module is running in Node or not.
+
 ## v0.2.1
 
 ### Fixes
