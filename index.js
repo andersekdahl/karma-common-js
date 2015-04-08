@@ -94,8 +94,8 @@ function createPreprocessor(config, basePath, logger) {
                   info.main = info.browser;
                   return info;
                 }
-                var replace_main = info.browser[info.main || './index.js'] || info.browser['./' + info.main || './index.js'];
-                info.main = replace_main || info.main;
+                var replaceMain = info.browser[info.main || './index.js'] || info.browser['./' + info.main || './index.js'];
+                info.main = replaceMain || info.main;
                 return info;
               }
             };
@@ -112,8 +112,8 @@ function createPreprocessor(config, basePath, logger) {
         }
         log.debug('Replacing require "%s" with "%s"', moduleName, modulePath);
       } catch (e) {
-        log.error('Failed to resolve "%s" in %s', moduleName, file.originalPath);
-        throw e;
+        modulePath = moduleName;
+        log.debug('Replacing require "%s" with "%s"', moduleName, modulePath);
       }
 
       // Since you don't want to specify your npm modules in karma.conf.js, we check
@@ -192,7 +192,11 @@ function createPreprocessor(config, basePath, logger) {
       processedContent = processedContent.replace(/new Buffer/g, "new require('buffer').Buffer");
     }
 
-    processedContent = processedContent.replace(/^(?!\s*[\/\/|\*]).*require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
+    if (/\.json$/.test(file.originalPath)) {
+      processedContent = 'module.exports = ' + processedContent;
+    } else {
+      processedContent = processedContent.replace(/^(?!\s*[\/\/|\*]).*require\(["']([^\)]+)["'][,\)]/mg, replaceModuleName);
+    }
 
     wrappedContent = aliases + wrapperHead + processedContent + wrapperFoot;
 
